@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:ui="jakarta.faces.facelets">
+<h:head>
+    <title>Calculadora de Materiais</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f7f7f7; }
+        .card { background: white; padding: 20px; margin-bottom: 18px; border-radius: 8px; box-shadow: 0 1px 5px #ccc; }
+        label { display:block; font-weight:bold; margin-top:8px; }
+        input { padding:6px; margin:4px; max-width: 180px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        .btn { padding: 9px 14px; margin: 6px 4px; cursor: pointer; }
+        .resultado { font-size: 18px; line-height: 1.5; }
+    </style>
+</h:head>
+<h:body>
+<h1>Calculadora de Materiais para Obra Residencial</h1>
+<h:form>
+    <div class="card">
+        <h2>Solicitação de orçamento</h2>
+        <h:outputLabel value="Nome do cliente" />
+        <h:inputText value="#{orcamentoView.solicitacao.nomeCliente}" />
+        <h3>Planta da casa / paredes</h3>
+        <ui:repeat value="#{orcamentoView.solicitacao.arestas}" var="a" varStatus="status">
+            <div class="card">
+                <b>Parede #{status.index + 1}</b><br/>
+                <label>Comprimento (m)</label><h:inputText value="#{a.comprimento}" />
+                <label>Altura (m)</label><h:inputText value="#{a.altura}" />
+                <label>Espessura (m)</label><h:inputText value="#{a.espessura}" />
+                <label>Tem porta?</label><h:selectBooleanCheckbox value="#{a.temPorta}" />
+                <label>Tem janela?</label><h:selectBooleanCheckbox value="#{a.temJanela}" />
+                <label>Altura abertura (m)</label><h:inputText value="#{a.alturaAbertura}" />
+                <label>Largura abertura (m)</label><h:inputText value="#{a.larguraAbertura}" />
+                <br/><h:commandButton styleClass="btn" value="Remover parede" action="#{orcamentoView.removerParede(a)}" />
+            </div>
+        </ui:repeat>
+        <h:commandButton styleClass="btn" value="Adicionar parede" action="#{orcamentoView.adicionarParede}" />
+    </div>
+    <div class="card">
+        <h2>Preços e margem</h2>
+        <label>Altura do tijolo (m)</label><h:inputText value="#{orcamentoView.solicitacao.alturaTijolo}" />
+        <label>Largura do tijolo (m)</label><h:inputText value="#{orcamentoView.solicitacao.larguraTijolo}" />
+        <label>Preço do tijolo (R$)</label><h:inputText value="#{orcamentoView.solicitacao.precoTijolo}" />
+        <label>Preço m³ concreto (R$)</label><h:inputText value="#{orcamentoView.solicitacao.precoMetroCubicoConcreto}" />
+        <label>Margem de lucro (%)</label><h:inputText value="#{orcamentoView.solicitacao.margemLucro}" />
+        <br/><h:commandButton styleClass="btn" value="Calcular e salvar orçamento" action="#{orcamentoView.calcular}" />
+    </div>
+    <div class="card">
+        <h2>Buscar orçamento</h2>
+        <h:inputText value="#{orcamentoView.numeroBusca}" />
+        <h:commandButton styleClass="btn" value="Buscar por número" action="#{orcamentoView.buscar}" />
+    </div>
+</h:form>
+<div class="card resultado">
+    <h:outputText value="#{orcamentoView.mensagem}" /><br/>
+    <h:panelGroup rendered="#{not empty orcamentoView.resultado}">
+        Nº: <h:outputText value="#{orcamentoView.resultado.numero}"/><br/>
+        Cliente: <h:outputText value="#{orcamentoView.resultado.nomeCliente}"/><br/>
+        Área total: <h:outputText value="#{orcamentoView.resultado.areaTotal}"/> m²<br/>
+        Volume de concreto: <h:outputText value="#{orcamentoView.resultado.volumeConcreto}"/> m³<br/>
+        Tijolos: <h:outputText value="#{orcamentoView.resultado.quantidadeTijolos}"/><br/>
+        Custo materiais: R$ <h:outputText value="#{orcamentoView.resultado.custoMateriais}"/><br/>
+        Lucro: R$ <h:outputText value="#{orcamentoView.resultado.valorLucro}"/><br/>
+        Valor final: R$ <h:outputText value="#{orcamentoView.resultado.valorFinal}"/>
+    </h:panelGroup>
+</div>
+<div class="card">
+    <h2>Orçamentos salvos</h2>
+    <table>
+        <tr><th>Número</th><th>Cliente</th><th>Valor final</th></tr>
+        <ui:repeat value="#{orcamentoView.orcamentos}" var="o">
+            <tr><td>#{o.numero}</td><td>#{o.nomeCliente}</td><td>R$ #{o.valorFinal}</td></tr>
+        </ui:repeat>
+    </table>
+</div>
+</h:body>
+</html>
